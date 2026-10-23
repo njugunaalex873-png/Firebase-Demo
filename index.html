@@ -96,9 +96,19 @@ const app = initializeApp(firebaseConfig);
     const password = document.getElementById("password");
     const logout = document.getElementById("logout");
 
-    document.getElementById("signup").onclick = () => {
-      form.dataset.action = "signup";
-    };
+    form.addEventListener("submit", async (event) => {
+  event.preventDefault();
+
+  try {
+    await createUserWithEmailAndPassword(
+      auth,
+      email.value.trim(),
+      password.value
+    );
+  } catch (error) {
+    status.textContent = error.code + ": " + error.message;
+  }
+});
 
     document.getElementById("signin").onclick = async () => {
       try {
