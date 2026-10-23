@@ -111,14 +111,20 @@ const app = initializeApp(firebaseConfig);
 });
 
     document.getElementById("signin").onclick = async () => {
-      try {
-        await signInWithEmailAndPassword(
-          auth, email.value.trim(), password.value
-        );
-      } catch (error) {
-        status.textContent = error.message;
-      }
-    };
+  status.textContent = "Signing in...";
+
+  try {
+    await signInWithEmailAndPassword(
+      auth,
+      email.value.trim(),
+      password.value
+    );
+    status.textContent = "Sign-in successful!";
+  } catch (error) {
+    status.textContent =
+      "Error: " + error.code + " — " + error.message;
+  }
+};
 
     form.addEventListener("submit", async (event) => {
       event.preventDefault();
