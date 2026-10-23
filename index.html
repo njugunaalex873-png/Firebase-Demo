@@ -1,0 +1,122 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Firebase Demo</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f0f7f2;
+      color: #183c2b;
+      padding: 24px;
+      max-width: 420px;
+      margin: 40px auto;
+    }
+    .panel {
+      background: white;
+      padding: 22px;
+      border-radius: 14px;
+      box-shadow: 0 4px 16px #0001;
+    }
+    input, button {
+      box-sizing: border-box;
+      width: 100%;
+      padding: 12px;
+      margin-top: 12px;
+      border-radius: 8px;
+    }
+    input { border: 1px solid #ccc; }
+    button {
+      border: 0;
+      background: #176b46;
+      color: white;
+      font-weight: bold;
+    }
+    #status { overflow-wrap: anywhere; }
+  </style>
+</head>
+<body>
+  <div class="panel">
+    <h1>Firebase Demo</h1>
+    <p>Create a test account or sign in.</p>
+
+    <form id="auth-form">
+      <input id="email" type="email"
+        placeholder="Email address" required>
+      <input id="password" type="password"
+        placeholder="Password (at least 6 characters)"
+        minlength="6" required>
+      <button type="submit" id="signup">Create account</button>
+      <button type="button" id="signin">Sign in</button>
+    </form>
+
+    <p id="status" role="status">Ready to connect.</p>
+    <button type="button" id="logout" hidden>Sign out</button>
+  </div>
+
+  <script type="module">
+    import { initializeApp }
+      from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
+    import {
+      getAuth,
+      createUserWithEmailAndPassword,
+      signInWithEmailAndPassword,
+      signOut,
+      onAuthStateChanged
+    } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
+
+    // Replace these placeholders with your Firebase web-app config.
+    const firebaseConfig = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+      projectId: "YOUR_PROJECT_ID",
+      appId: "YOUR_APP_ID"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const form = document.getElementById("auth-form");
+    const status = document.getElementById("status");
+    const email = document.getElementById("email");
+    const password = document.getElementById("password");
+    const logout = document.getElementById("logout");
+
+    document.getElementById("signup").onclick = () => {
+      form.dataset.action = "signup";
+    };
+
+    document.getElementById("signin").onclick = async () => {
+      try {
+        await signInWithEmailAndPassword(
+          auth, email.value.trim(), password.value
+        );
+      } catch (error) {
+        status.textContent = error.message;
+      }
+    };
+
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      if (form.dataset.action !== "signup") return;
+      try {
+        await createUserWithEmailAndPassword(
+          auth, email.value.trim(), password.value
+        );
+      } catch (error) {
+        status.textContent = error.message;
+      }
+    });
+
+    logout.onclick = () => signOut(auth);
+
+    onAuthStateChanged(auth, (user) => {
+      status.textContent = user
+        ? "Signed in as " + user.email
+        : "Not signed in.";
+      logout.hidden = !user;
+    });
+  </script>
+</body>
+</html>
